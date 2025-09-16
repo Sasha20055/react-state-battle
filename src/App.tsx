@@ -38,7 +38,7 @@ function App() {
     const player = queue === 0 ? 'X' : 'O'
 
     useEffect(() => {
-        winner !== null && clean()
+        if(winner !== null) clean()
     }, [squares])
 
     return (
@@ -47,7 +47,7 @@ function App() {
           Player {player}
       </h1>
       <div className="rootBox">
-          {squares.map((square: Mark, index: number) => <Square squareId={index} setSquare={setSquare} square={square}/>)}
+          {squares.map((_square: Mark, index: number) => <Square squareId={index} setSquare={setSquare} square={squares[index]}/>)}
       </div>
         <button onClick={clean}>Retry</button>
     </>
