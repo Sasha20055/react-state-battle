@@ -1,29 +1,61 @@
 import './App.css'
-import {Box} from "@mui/material";
 import {useStore} from "./store/store.ts";
+import {useEffect} from "react";
 
+type Mark = 'X' | 'O' | 'null'
+
+type SquareProps = {
+    square?: Mark[];
+    setSquare: (squareId: number) => void
+    squareId: number
+};
+
+function calculateWinner(squares: string[]) {
+    const lines: [number, number, number][] = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+
+    for (const [a, b, c] of lines) {
+        const v = squares[a];
+        if (v !== 'null' && v === squares[b] && v === squares[c]) {
+            return v;
+        }
+    }
+
+    return null;
+}
 
 function App() {
-    const { count, up } = useStore()
+    const {squares, setSquare, clean, queue} = useStore()
+    const winner: string | null = calculateWinner(squares)
+    const player = queue === 0 ? 'X' : 'O'
+
+    useEffect(() => {
+        winner !== null && clean()
+    }, [squares])
 
     return (
     <>
-      <Box>
-      </Box>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={up}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <h1 className={`player ${player}`}>
+          Player {player}
+      </h1>
+      <div className="rootBox">
+          {squares.map((square: Mark, index: number) => <Square squareId={index} setSquare={setSquare} square={square}/>)}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+        <button onClick={clean}>Retry</button>
     </>
   )
+}
+
+function Square({square, setSquare, squareId}: SquareProps) {
+    return <button className={`${square} square`} onClick={() => setSquare(squareId)}/>
 }
 
 export default App

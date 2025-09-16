@@ -1,12 +1,19 @@
 import {create} from "zustand/react";
+import {combine} from "zustand/middleware";
 
 
-interface Store {
-    count: number;
-    up: () => void
-}
+export const useStore = create(combine(
+    {squares: Array(9).fill('null'), queue: 0},
+    (set) => ({
+        setSquare: (i: number) => set((state) => {
+            if(state.squares[i] !== 'null') return {}
 
-export const useStore = create<Store>()(set => ({
-    count: 0,
-    up: () => (set((state) => ({ count: state.count + 1})))
-}))
+            const next = state.squares.slice()
+            next[i] = state.queue === 0 ? 'x' : 'o'
+            return {squares: next, queue: state.queue === 0 ? 1 : 0}
+        }),
+        clean: () => set(() => {
+            return {squares: Array(9).fill('null'), queue: 0}
+        })
+    })
+))
